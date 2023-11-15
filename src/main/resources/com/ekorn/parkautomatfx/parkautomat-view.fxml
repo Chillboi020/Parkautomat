@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.ekorn.parkautomatfx.GeldPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="663.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ekorn.parkautomatfx.ParkoController">
+   <children>
+      <Label alignment="CENTER" layoutX="125.0" layoutY="14.0" prefHeight="70.0" prefWidth="350.0" text="Parkautomat">
+         <font>
+            <Font name="Bauhaus 93" size="50.0" />
+         </font>
+      </Label>
+      <TitledPane animated="false" layoutX="65.0" layoutY="94.0" prefHeight="100.0" prefWidth="475.0" text="Bestand">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <GeldPane fx:id="geld_bestand" />
+               </children>
+            </AnchorPane>
+        </content>
+      </TitledPane>
+      <Label layoutX="65.0" layoutY="221.0" text="Betrag:">
+         <font>
+            <Font name="Bauhaus 93" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="lbl_betrag" alignment="CENTER_RIGHT" layoutX="150.0" layoutY="218.0" prefHeight="35.0" prefWidth="100.0">
+         <font>
+            <Font name="Comic Sans MS" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="btn_random_betrag" layoutX="280.0" layoutY="221.0" mnemonicParsing="false" onAction="#onRandomBetrag" text="Zufälliger Betrag">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_zehn_ct" layoutX="63.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="10c">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_zwanzig_ct" layoutX="115.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="20c">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_fuenfzig_ct" layoutX="167.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="50c">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_ein_euro" layoutX="219.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="1€">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_zwei_euro" layoutX="263.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="2€">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_fuenf_euro" layoutX="307.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="5€">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_zehn_euro" layoutX="351.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="10€">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_zwanzig_euro" layoutX="405.0" layoutY="275.0" mnemonicParsing="false" onMouseClicked="#addGeld" text="20€">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_fertig" layoutX="475.0" layoutY="275.0" mnemonicParsing="false" onAction="#onFertig" text="Fertig">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <TitledPane animated="false" layoutX="65.0" layoutY="332.0" prefHeight="100.0" prefWidth="475.0" text="Gezahlt">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <GeldPane fx:id="geld_gezahlt" />
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" layoutX="65.0" layoutY="455.0" prefHeight="100.0" prefWidth="475.0" text="Rückgeld">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <GeldPane fx:id="geld_rueckgeld" />
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+   </children>
+</AnchorPane>
