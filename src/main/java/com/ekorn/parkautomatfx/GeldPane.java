@@ -61,29 +61,58 @@ public class GeldPane extends Pane {
      */
     public void setValue(int type, int amount) {
         k.getGeldspeicher().setAnzahl(type, amount);
-        int i = k.getGeldspeicher().getAnzahl(type);
+        updateValue(type);
+    }
 
+    public void updateValue(int type) {
+        int i = k.getGeldspeicher().getAnzahl(type);
         TextField[] muenzen = {txt_zehnCent, txt_zwanzigCent, txt_fuenfzigCent, txt_einEuro, txt_zweiEuro, txt_fuenfEuro, txt_zehnEuro, txt_zwanzigEuro};
         muenzen[type].setText(String.valueOf(i));
     }
 
+    /**
+     * gets the total amount of money from the current GeldPane.
+     * @return the total amount.
+     */
     public int getBetrag() {
         return k.getBetrag();
     }
 
+    /**
+     * gets the Label for the total amount of money from the current GeldPane.
+     * @return Label "Gesamt".
+     */
     public Label getGesamt() {
         return lbl_gesamt;
     }
 
+    /**
+     * gets the Geldmenge from the Kasse in the current GeldPane.
+     * @return the Geldmenge.
+     */
     public Geldmenge getGeldSpeicher() {
         return k.getGeldspeicher();
     }
 
+    /**
+     * sets the Geldmenge from the Kasse in the current GeldPane.
+     * @param gm the Geldmenge.
+     */
     public void setGeldSpeicher(Geldmenge gm) {
         k.setGeldspeicher(gm);
     }
 
+    /**
+     * pays the given price with the given Geldmenge.
+     * @param price the price to pay.
+     * @param gm the Geldmenge to pay with.
+     * @return the change.
+     */
     public Geldmenge payment(int price, Geldmenge gm) {
-        return k.bezahle(price, gm);
+        Geldmenge wechselgeld = k.bezahle(price, gm);
+        for (int i = 0; i < 8; i++) {
+            updateValue(i);
+        }
+        return wechselgeld;
     }
 }

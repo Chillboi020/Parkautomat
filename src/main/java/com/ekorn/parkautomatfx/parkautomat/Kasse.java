@@ -6,39 +6,39 @@ public class Kasse {
     private Geldmenge geldspeicher;
 
     /**
-     * Legt eine Kasse mit einem Geldspeicher an.
-     * @param gm Der Geldspeicher.
+     * Creates a new Kasse with a Geldspeicher.
+     * @param gm The Geldspeicher.
      */
     public Kasse(Geldmenge gm) {
         setGeldspeicher(gm);
     }
 
     /**
-     * Legt eine Kasse mit einem leeren Geldspeicher an.
+     * Creates a new Kasse with an empty Geldspeicher.
      */
     public Kasse() {
         this(new Geldmenge());
     }
 
     /**
-     * Ruft den Geldspeicher dieser Kasse ab.
-     * @return Der Geldspeicher der Kasse.
+     * Gets the Geldspeicher of this Kasse.
+     * @return The Geldspeicher of this Kasse.
      */
     public Geldmenge getGeldspeicher() {
         return geldspeicher;
     }
 
     /**
-     * Setzt den Geldspeicher dieser Kasse.
-     * @param gm Der Geldspeicher, den man hinzufügen will.
+     * Sets the Geldspeicher of this Kasse.
+     * @param gm The Geldspeicher to set.
      */
     public void setGeldspeicher(Geldmenge gm) {
         this.geldspeicher = gm;
     }
 
     /**
-     * Gibt den Gesamtbetrag im Speicher zurück.
-     * @return Gesamtbetrag im Geldspeicher.
+     * Gets the total amount of the Geldspeicher.
+     * @return Total amount of the Geldspeicher.
      */
     public int getBetrag() {
         int betrag = 0;
@@ -49,19 +49,19 @@ public class Kasse {
     }
 
     /**
-     * Hier wird die Bezahlung ausgeführt
-     * @param preis Der zu zahlende Preis.
-     * @param gm Die Geldmenge, mit der gezahlt wird.
-     * @return Das Wechselgeld.
+     * This is where the payment is done.
+     * @param preis The price to pay.
+     * @param gm The Geldmenge to pay the price with.
+     * @return The change.
      */
     public Geldmenge bezahle(int preis, Geldmenge gm) {
         Geldmenge wechselgeld = new Geldmenge();
 
-        // Wichtig als Backup, falls ein Fehler auftritt
+        // Important as backup in case an error occurs
         Geldmenge kopie_geldspeicher = new Geldmenge(geldspeicher);
 
-        // Der Gesamtbetrag der übergebenen Geldmenge
-        // Der Geldspeicher der Kasse wird dementsprechend aktualisiert
+        // The total amount of the given Geldmenge
+        // Updates the Geldspeicher afterward
         int gm_betrag = 0;
         for (int i = 0; i < MUENZART.length; i++) {
             gm_betrag += MUENZART[i] * gm.getAnzahl(i);
@@ -71,7 +71,7 @@ public class Kasse {
         }
         int restbetrag = gm_betrag - preis;
 
-        // Falls der Restbetrag keine Zehnerzahlen hat
+        // If restbetrag is not a multiple of 10, it is not possible to pay.
         if (restbetrag % 10 != 0) {
             throw new IllegalArgumentException("Wechseln nicht möglich!");
         }
@@ -80,7 +80,7 @@ public class Kasse {
             int anzahl = 0;
             int i = 0;
 
-            // Hier wird der Restbetrag ausgeglichen (Geldspeicher wird aktualisiert!)
+            // Here the restbetrag is calculated (Geldspeicher is updated respectively
             for (i = MUENZART.length - 1; restbetrag != 0;) {
                 if ((restbetrag - MUENZART[i]) >= 0 && geldspeicher.getAnzahl(i) > 0) {
                     restbetrag -= MUENZART[i];
@@ -92,11 +92,11 @@ public class Kasse {
                     i--;
                 }
             }
-            // Zum Schluss muss nochmal aktualisiert werden!
+            // At the end we need to update again!
             wechselgeld.setAnzahl(i, anzahl);
             geldspeicher.setAnzahl(i, -anzahl);
 
-            // Falls im Geldspeicher negative Anzahlen von Münzen auftreten
+            // If negative amounts appear in the Geldspeicher, it is not possible to pay.
             for (i = 0; i < MUENZART.length; i++) {
                 if (geldspeicher.getAnzahl(i) < 0) {
                     throw new IllegalArgumentException("Im Geldspeicher reichen die Münzen nicht aus!");
@@ -104,7 +104,7 @@ public class Kasse {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            // Geldspeicher auf letzten Stand zurücksetzen
+            // Revert changes of the Geldspeicher
             geldspeicher = kopie_geldspeicher;
             return new Geldmenge();
         }
