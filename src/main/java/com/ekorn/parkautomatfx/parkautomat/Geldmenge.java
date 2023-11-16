@@ -32,7 +32,15 @@ public class Geldmenge {
     }
 
     public void setAnzahl(int muenzart, int anzahl) {
-        muenzMenge[muenzart] += anzahl;
+        if (anzahl < 0) {
+            throw new IllegalArgumentException("Negative Anzahl nicht möglich!");
+        }
+        muenzMenge[muenzart] = anzahl;
+    }
+
+    public void addAnzahl(int muenzart, int anzahl) {
+        int sum = anzahl + getAnzahl(muenzart);
+        setAnzahl(muenzart, sum);
     }
 
     @Override

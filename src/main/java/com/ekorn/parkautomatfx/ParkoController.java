@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import java.io.FileReader;
@@ -53,7 +52,7 @@ public class ParkoController implements Initializable {
     //region Variables
     private ArrayList<Button> muenzButtons = new ArrayList<>();
     private int randBetrag;
-    private boolean istBezahlt = false;
+    private boolean zahlungsvorgang = false;
     //endregion
 
 
@@ -69,39 +68,32 @@ public class ParkoController implements Initializable {
         while (randBetrag % 10 != 0) {
             randBetrag++;
         }
+        zahlungsvorgang = true;
         btn_random_betrag.setDisable(true);
-        lbl_betrag.setText(String.format("%.2f", (double) randBetrag / 100) + "€");
+        updateBetrag(lbl_betrag, randBetrag);
+        reset();
     }
 
     /**
      * Adds or removes money from the current GeldPane.
+     *
      * @param mouse the mouse event.
      */
     @FXML
     public void addGeld(MouseEvent mouse) {
-        if (!istBezahlt) {
+        if (zahlungsvorgang) {
             Button b = (Button) mouse.getSource();
             int index = muenzButtons.indexOf(b);
 
             int i = 1;
-            // With right-click you remove one coin
-            if (mouse.getButton() == MouseButton.SECONDARY) {
-                i = -1;
-            }
+            Geldmenge gm = new Geldmenge();
+            gm.addAnzahl(index, i);
+            updateValues(gm, geld_gezahlt, false);
 
-            // negative values become impossible
-            if (geld_gezahlt.getValue(index) + i >= 0)
-            {
-                Geldmenge gm = new Geldmenge();
-                gm.setAnzahl(index, i);
-                updateValues(gm, geld_gezahlt);
-            }
-
-            // if the amount of money is equal or bigger than the random amount, then we can pay
+            // payment proceeds automatically if it's possible to pay
             if (geld_gezahlt.getBetrag() >= randBetrag) {
-                Geldmenge wechsel = geld_bestand.payment(randBetrag, geld_gezahlt.getGeldSpeicher());
-                updateValues(wechsel, geld_rueckgeld);
-                istBezahlt = true;
+                payment();
+                btn_fertig.setDisable(true);
             }
         }
     }
@@ -111,7 +103,12 @@ public class ParkoController implements Initializable {
      */
     @FXML
     public void onFertig() {
-
+        if (zahlungsvorgang) {
+            if (geld_gezahlt.getBetrag() < randBetrag) {
+                throw new IllegalArgumentException("Noch nicht genug Geld zum zahlen!");
+            }
+            payment();
+        }
     }
     //endregion
 
@@ -120,16 +117,20 @@ public class ParkoController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         muenzButtons = new ArrayList<>() {{
-            add(btn_zehn_ct); add(btn_zwanzig_ct);
-            add(btn_fuenfzig_ct); add(btn_ein_euro);
-            add(btn_zwei_euro); add(btn_fuenf_euro);
-            add(btn_zehn_euro); add(btn_zwanzig_euro);
+            add(btn_zehn_ct);
+            add(btn_zwanzig_ct);
+            add(btn_fuenfzig_ct);
+            add(btn_ein_euro);
+            add(btn_zwei_euro);
+            add(btn_fuenf_euro);
+            add(btn_zehn_euro);
+            add(btn_zwanzig_euro);
         }};
 
         // All three GeldPanes get initialized
-        updateValues(readStartgeldmenge(), geld_bestand);
-        updateValues(new Geldmenge(), geld_gezahlt);
-        updateValues(new Geldmenge(), geld_rueckgeld);
+        updateValues(readStartgeldmenge(), geld_bestand, true);
+        reset();
+        updateBetrag(lbl_betrag, 0);
     }
 
     // Reads the Geldmenge from init.csv to the first GeldPane
@@ -151,9 +152,13 @@ public class ParkoController implements Initializable {
     }
 
     // Updates the values whenever something happens
-    public void updateValues(Geldmenge gm, GeldPane gp) {
+    public void updateValues(Geldmenge gm, GeldPane gp, boolean reset) {
         for (int i = 0; i < muenzButtons.size(); i++) {
-            gp.setValue(i, gm.getAnzahl(i));
+            if (reset) {
+                gp.setValue(i, gm.getAnzahl(i));
+            } else {
+                gp.addValue(i, gm.getAnzahl(i));
+            }
         }
         updateBetrag(gp.getGesamt(), gp.getBetrag());
     }
@@ -161,6 +166,28 @@ public class ParkoController implements Initializable {
     // Updates a Label with the value
     public void updateBetrag(Label l, int betrag) {
         l.setText(String.format("%.2f", (double) betrag / 100) + "€");
+    }
+
+    public void payment() {
+        try {
+            Geldmenge wechsel = geld_bestand.payment(randBetrag, geld_gezahlt.getGeldSpeicher());
+
+            updateValues(wechsel, geld_rueckgeld, false);
+            updateBetrag(geld_bestand.getGesamt(), geld_bestand.getBetrag());
+
+            btn_random_betrag.setDisable(false);
+        } catch (Exception e) {
+            btn_random_betrag.setDisable(false);
+            updateBetrag(lbl_betrag, 0);
+            updateValues(new Geldmenge(), geld_gezahlt, true);
+            System.out.println(e.getMessage());
+        }
+        zahlungsvorgang = false;
+    }
+
+    public void reset() {
+        updateValues(new Geldmenge(), geld_gezahlt, true);
+        updateValues(new Geldmenge(), geld_rueckgeld, true);
     }
     //endregion
 }

@@ -64,6 +64,11 @@ public class GeldPane extends Pane {
         updateValue(type);
     }
 
+    public void addValue(int type, int amount) {
+        k.getGeldspeicher().addAnzahl(type, amount);
+        updateValue(type);
+    }
+
     public void updateValue(int type) {
         int i = k.getGeldspeicher().getAnzahl(type);
         TextField[] muenzen = {txt_zehnCent, txt_zwanzigCent, txt_fuenfzigCent, txt_einEuro, txt_zweiEuro, txt_fuenfEuro, txt_zehnEuro, txt_zwanzigEuro};

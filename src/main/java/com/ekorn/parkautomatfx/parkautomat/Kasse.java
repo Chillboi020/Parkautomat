@@ -56,6 +56,7 @@ public class Kasse {
      */
     public Geldmenge bezahle(int preis, Geldmenge gm) {
         Geldmenge wechselgeld = new Geldmenge();
+        String msg = "Wechseln nicht möglich!";
 
         // Important as backup in case an error occurs
         Geldmenge kopie_geldspeicher = new Geldmenge(geldspeicher);
@@ -66,47 +67,42 @@ public class Kasse {
         for (int i = 0; i < MUENZART.length; i++) {
             gm_betrag += MUENZART[i] * gm.getAnzahl(i);
             if (gm.getAnzahl(i) > 0) {
-                geldspeicher.setAnzahl(i, gm.getAnzahl(i));
+                geldspeicher.addAnzahl(i, gm.getAnzahl(i));
             }
         }
         int restbetrag = gm_betrag - preis;
 
         // If restbetrag is not a multiple of 10, it is not possible to pay.
         if (restbetrag % 10 != 0) {
-            throw new IllegalArgumentException("Wechseln nicht möglich!");
+            throw new IllegalArgumentException(msg);
         }
 
         try {
             int anzahl = 0;
-            int i = 0;
-
+            int i;
             // Here the restbetrag is calculated (Geldspeicher is updated respectively
-            for (i = MUENZART.length - 1; restbetrag != 0;) {
-                if ((restbetrag - MUENZART[i]) >= 0 && geldspeicher.getAnzahl(i) > 0) {
+            for (i = MUENZART.length - 1; restbetrag > 0;) {
+                if (i < 0) {
+                    throw new IllegalArgumentException(msg);
+                }
+                if ((restbetrag - MUENZART[i]) >= 0 /*&& geldspeicher.getAnzahl(i) > 0*/) {
                     restbetrag -= MUENZART[i];
                     anzahl++;
                 } else {
-                    wechselgeld.setAnzahl(i, anzahl);
-                    geldspeicher.setAnzahl(i, -anzahl);
+                    wechselgeld.addAnzahl(i, anzahl);
+                    geldspeicher.addAnzahl(i, -anzahl);
                     anzahl = 0;
                     i--;
                 }
             }
-            // At the end we need to update again!
-            wechselgeld.setAnzahl(i, anzahl);
-            geldspeicher.setAnzahl(i, -anzahl);
+            // One last update of the values
+            wechselgeld.addAnzahl(i, anzahl);
+            geldspeicher.addAnzahl(i, -anzahl);
 
-            // If negative amounts appear in the Geldspeicher, it is not possible to pay.
-            for (i = 0; i < MUENZART.length; i++) {
-                if (geldspeicher.getAnzahl(i) < 0) {
-                    throw new IllegalArgumentException("Im Geldspeicher reichen die Münzen nicht aus!");
-                }
-            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             // Revert changes of the Geldspeicher
             geldspeicher = kopie_geldspeicher;
-            return new Geldmenge();
+            throw new IllegalArgumentException(e.getMessage());
         }
         return wechselgeld;
     }
