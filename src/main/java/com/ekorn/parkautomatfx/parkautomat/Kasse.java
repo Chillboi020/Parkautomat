@@ -56,7 +56,7 @@ public class Kasse {
      */
     public Geldmenge bezahle(int preis, Geldmenge gm) {
         Geldmenge wechselgeld = new Geldmenge();
-        String msg = "Wechseln nicht möglich!";
+        String msg = "Wechseln nicht möglich";
 
         // Important as backup in case an error occurs
         Geldmenge kopie_geldspeicher = new Geldmenge(geldspeicher);
@@ -74,7 +74,7 @@ public class Kasse {
 
         // If restbetrag is not a multiple of 10, it is not possible to pay.
         if (restbetrag % 10 != 0) {
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException(msg + ", keine zehner Zahl!");
         }
 
         try {
@@ -83,9 +83,9 @@ public class Kasse {
             // Here the restbetrag is calculated (Geldspeicher is updated respectively
             for (i = MUENZART.length - 1; restbetrag > 0;) {
                 if (i < 0) {
-                    throw new IllegalArgumentException(msg);
+                    throw new IllegalArgumentException(msg + ", Restbetrag kann nicht beglichen werden!");
                 }
-                if ((restbetrag - MUENZART[i]) >= 0 /*&& geldspeicher.getAnzahl(i) > 0*/) {
+                if ((restbetrag - MUENZART[i]) >= 0) {
                     restbetrag -= MUENZART[i];
                     anzahl++;
                 } else {

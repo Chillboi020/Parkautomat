@@ -33,7 +33,7 @@ public class Geldmenge {
 
     public void setAnzahl(int muenzart, int anzahl) {
         if (anzahl < 0) {
-            throw new IllegalArgumentException("Negative Anzahl nicht möglich!");
+            throw new IllegalArgumentException("Keine passenden Münzen vorhanden!");
         }
         muenzMenge[muenzart] = anzahl;
     }
