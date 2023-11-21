@@ -1,5 +1,7 @@
 package com.ekorn.parkautomatfx.parkautomat;
 
+import com.ekorn.parkautomatfx.exceptions.WechselgeldException;
+
 public class Geldmenge {
 
     private final int[] muenzMenge = new int[8];
@@ -8,8 +10,12 @@ public class Geldmenge {
                      int one, int two, int five, int ten, int twenty) {
         int[] mengen = {ten_cent, twenty_cent, fifty_cent, one, two, five, ten, twenty};
 
-        for (int i = 0; i < muenzMenge.length; i++) {
-            setAnzahl(i, mengen[i]);
+        try {
+            for (int i = 0; i < muenzMenge.length; i++) {
+                setAnzahl(i, mengen[i]);
+            }
+        } catch (WechselgeldException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -31,14 +37,14 @@ public class Geldmenge {
         return muenzMenge[muenzart];
     }
 
-    public void setAnzahl(int muenzart, int anzahl) {
+    public void setAnzahl(int muenzart, int anzahl) throws WechselgeldException {
         if (anzahl < 0) {
-            throw new IllegalArgumentException("Keine passenden Münzen vorhanden!");
+            throw new WechselgeldException(4, 0);
         }
         muenzMenge[muenzart] = anzahl;
     }
 
-    public void addAnzahl(int muenzart, int anzahl) {
+    public void addAnzahl(int muenzart, int anzahl) throws WechselgeldException {
         int sum = anzahl + getAnzahl(muenzart);
         setAnzahl(muenzart, sum);
     }

@@ -1,7 +1,9 @@
 package com.ekorn.parkautomatfx.parkautomat;
 
+import com.ekorn.parkautomatfx.exceptions.WechselgeldException;
+
 public class ParkautomatTestProg {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws WechselgeldException {
         // 5x10c 0x20c, 8x50c, 0x1€, 7x2€, keine Scheine
         Geldmenge startMenge = new Geldmenge(5, 0, 8, 0, 7, 0, 0, 0);
         System.out.println(startMenge);

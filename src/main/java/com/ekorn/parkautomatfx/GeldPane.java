@@ -1,5 +1,6 @@
 package com.ekorn.parkautomatfx;
 
+import com.ekorn.parkautomatfx.exceptions.WechselgeldException;
 import com.ekorn.parkautomatfx.parkautomat.Geldmenge;
 import com.ekorn.parkautomatfx.parkautomat.Kasse;
 import javafx.fxml.FXML;
@@ -59,12 +60,12 @@ public class GeldPane extends Pane {
      * @param type the money-type (1 - 8).
      * @param amount the amount.
      */
-    public void setValue(int type, int amount) {
+    public void setValue(int type, int amount) throws WechselgeldException {
         k.getGeldspeicher().setAnzahl(type, amount);
         updateValue(type);
     }
 
-    public void addValue(int type, int amount) {
+    public void addValue(int type, int amount) throws WechselgeldException {
         k.getGeldspeicher().addAnzahl(type, amount);
         updateValue(type);
     }
@@ -113,7 +114,7 @@ public class GeldPane extends Pane {
      * @param gm the Geldmenge to pay with.
      * @return the change.
      */
-    public Geldmenge payment(int price, Geldmenge gm) {
+    public Geldmenge payment(int price, Geldmenge gm) throws WechselgeldException {
         Geldmenge wechselgeld = k.bezahle(price, gm);
         for (int i = 0; i < 8; i++) {
             updateValue(i);

@@ -1,5 +1,7 @@
 package com.ekorn.parkautomatfx.parkautomat;
 
+import com.ekorn.parkautomatfx.exceptions.ParkomatException;
+
 public class ParkoTest2 {
     public static void main(String[] args) {
         Geldmenge g = new Geldmenge(2, 3, 1, 2, 3);
@@ -22,8 +24,8 @@ public class ParkoTest2 {
         Geldmenge r2 = new Geldmenge();
         try {
             r2 = k.bezahle(260, z1);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (ParkomatException e) {
+            System.out.println(e.getMsg());
         }
     }
 }

@@ -1,5 +1,8 @@
 package com.ekorn.parkautomatfx.parkautomat;
 
+import com.ekorn.parkautomatfx.exceptions.KeinPassendesRueckgeldException;
+import com.ekorn.parkautomatfx.exceptions.WechselgeldException;
+
 public class Kasse {
     // 10c, 20c, 50c, 1€, 2€, 5€, 10€, 20€
     private static final int[] MUENZART = {10, 20, 50, 100, 200, 500, 1000, 2000};
@@ -7,6 +10,7 @@ public class Kasse {
 
     /**
      * Creates a new Kasse with a Geldspeicher.
+     *
      * @param gm The Geldspeicher.
      */
     public Kasse(Geldmenge gm) {
@@ -22,6 +26,7 @@ public class Kasse {
 
     /**
      * Gets the Geldspeicher of this Kasse.
+     *
      * @return The Geldspeicher of this Kasse.
      */
     public Geldmenge getGeldspeicher() {
@@ -30,6 +35,7 @@ public class Kasse {
 
     /**
      * Sets the Geldspeicher of this Kasse.
+     *
      * @param gm The Geldspeicher to set.
      */
     public void setGeldspeicher(Geldmenge gm) {
@@ -38,6 +44,7 @@ public class Kasse {
 
     /**
      * Gets the total amount of the Geldspeicher.
+     *
      * @return Total amount of the Geldspeicher.
      */
     public int getBetrag() {
@@ -50,13 +57,18 @@ public class Kasse {
 
     /**
      * This is where the payment is done.
+     *
      * @param preis The price to pay.
-     * @param gm The Geldmenge to pay the price with.
+     * @param gm    The Geldmenge to pay the price with.
      * @return The change.
+     * @throws WechselgeldException            Any error within the payment
+     * @throws KeinPassendesRueckgeldException If the change isn't fitting
      */
-    public Geldmenge bezahle(int preis, Geldmenge gm) {
-        Geldmenge wechselgeld = new Geldmenge();
-        String msg = "Wechseln nicht möglich";
+    public Geldmenge bezahle(int preis, Geldmenge gm) throws WechselgeldException, KeinPassendesRueckgeldException {
+        // If restbetrag is not a multiple of 10, it is not possible to pay.
+        if (preis % 10 != 0) {
+            throw new WechselgeldException(1, 0);
+        }
 
         // Important as backup in case an error occurs
         Geldmenge kopie_geldspeicher = new Geldmenge(geldspeicher);
@@ -67,43 +79,40 @@ public class Kasse {
         for (int i = 0; i < MUENZART.length; i++) {
             gm_betrag += MUENZART[i] * gm.getAnzahl(i);
             if (gm.getAnzahl(i) > 0) {
-                geldspeicher.addAnzahl(i, gm.getAnzahl(i));
+                kopie_geldspeicher.addAnzahl(i, gm.getAnzahl(i));
             }
         }
-        int restbetrag = gm_betrag - preis;
-
-        // If restbetrag is not a multiple of 10, it is not possible to pay.
-        if (restbetrag % 10 != 0) {
-            throw new IllegalArgumentException(msg + ", keine zehner Zahl!");
+        if (gm_betrag == 0) {
+            throw new WechselgeldException(2, 0);
         }
 
-        try {
-            int anzahl = 0;
-            int i;
-            // Here the restbetrag is calculated (Geldspeicher is updated respectively
-            for (i = MUENZART.length - 1; restbetrag > 0;) {
-                if (i < 0) {
-                    throw new IllegalArgumentException(msg + ", Restbetrag kann nicht beglichen werden!");
-                }
+        int restbetrag = gm_betrag - preis;
+        if (restbetrag < 0) {
+            throw new WechselgeldException(3, 0);
+        }
+
+        Geldmenge wechselgeld = new Geldmenge();
+        // if there is no need for change
+        if (restbetrag != 0) {
+            // Here the restbetrag is calculated (Geldspeicher is updated respectively)
+            for (int anzahl = 0, i = MUENZART.length - 1; i >= 0; ) {
                 if ((restbetrag - MUENZART[i]) >= 0) {
                     restbetrag -= MUENZART[i];
                     anzahl++;
                 } else {
                     wechselgeld.addAnzahl(i, anzahl);
-                    geldspeicher.addAnzahl(i, -anzahl);
+                    try {
+                        kopie_geldspeicher.addAnzahl(i, -anzahl);
+                    } catch (WechselgeldException e) {
+                        throw new KeinPassendesRueckgeldException();
+                    }
                     anzahl = 0;
                     i--;
                 }
             }
-            // One last update of the values
-            wechselgeld.addAnzahl(i, anzahl);
-            geldspeicher.addAnzahl(i, -anzahl);
-
-        } catch (Exception e) {
-            // Revert changes of the Geldspeicher
-            geldspeicher = kopie_geldspeicher;
-            throw new IllegalArgumentException(e.getMessage());
         }
+        // When everything worked out
+        geldspeicher = kopie_geldspeicher;
         return wechselgeld;
     }
 }
