@@ -12,12 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Scanner;
-
 
 public class ParkoController implements Initializable {
 
@@ -100,7 +102,7 @@ public class ParkoController implements Initializable {
             try {
                 gm.addAnzahl(index, 1);
             } catch (WechselgeldException e) {
-                System.out.println("Etwas hat nicht geklappt");
+                fehlerProtokoll("Programmfehler: beim hinzufügen von Münzen hat etwas nicht geklappt!");
             }
             updateValues(gm, geld_gezahlt, false);
 
@@ -112,7 +114,7 @@ public class ParkoController implements Initializable {
     }
 
     /**
-     * When finished, then we will try to pay the amount.
+     * When finished, then we will try to pay the amount. <br>
      * However, since it works automatically this button is kinda
      * useless.
      */
@@ -125,7 +127,7 @@ public class ParkoController implements Initializable {
     //endregion
 
     //region Methods
-    // The initialization of the controller
+    // the initialization of the controller
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         muenzButtons = new Button[]{btn_zehn_ct, btn_zwanzig_ct, btn_fuenfzig_ct,
@@ -138,7 +140,7 @@ public class ParkoController implements Initializable {
         updateBetrag(lbl_betrag, 0);
     }
 
-    // Reads the Geldmenge from init.csv to the first GeldPane
+    // reads the Geldmenge from init.csv to the first GeldPane
     public Geldmenge readStartgeldmenge() {
         Geldmenge gm = new Geldmenge();
         try (FileReader fr = new FileReader("init.csv"); Scanner sc = new Scanner(fr);) {
@@ -148,12 +150,22 @@ public class ParkoController implements Initializable {
                 gm.setAnzahl(i, Integer.parseInt(data[i]));
             }
         } catch (IOException | WechselgeldException e) {
-            System.out.println(e.getMessage());
+            fehlerProtokoll(e.getMessage());
         }
         return gm;
     }
 
-    // Updates the values whenever something happens
+    // every error gets written into the "fehler.log" file with a timestamp
+    public void fehlerProtokoll(String msg) {
+        try (FileWriter fw = new FileWriter("fehler.log", true);) {
+            String timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+            fw.write(timestamp + ": " + msg + "\n");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // updates the values whenever something happens
     public void updateValues(Geldmenge gm, GeldPane gp, boolean reset) {
         try {
             for (int i = 0; i < muenzButtons.length; i++) {
@@ -165,15 +177,16 @@ public class ParkoController implements Initializable {
             }
             updateBetrag(gp.getGesamt(), gp.getBetrag());
         } catch (WechselgeldException e) {
-            System.out.println("Beim aktualisieren ist ein Fehler aufgetreten");
+            fehlerProtokoll(e.getMsg());
         }
     }
 
-    // Updates a Label with the value
+    // updates a Label with the value
     public void updateBetrag(Label l, int betrag) {
         l.setText(String.format("%.2f", (double) betrag / 100) + "€");
     }
 
+    // the payment method for this controller
     public void payment() {
         try {
             Geldmenge wechsel = geld_bestand.payment(randBetrag, geld_gezahlt.getGeldSpeicher());
@@ -183,6 +196,7 @@ public class ParkoController implements Initializable {
         } catch (ParkomatException e) {
             updateBetrag(lbl_betrag, 0);
             updateValues(new Geldmenge(), geld_gezahlt, true);
+            fehlerProtokoll(e.getMsg());
             a.setContentText(e.getMsg());
             a.setHeaderText(e.getHeader());
             a.setTitle(e.getTitle());
@@ -193,6 +207,7 @@ public class ParkoController implements Initializable {
         zahlungsvorgang = false;
     }
 
+    // resets all values
     public void reset() {
         updateValues(new Geldmenge(), geld_gezahlt, true);
         updateValues(new Geldmenge(), geld_rueckgeld, true);

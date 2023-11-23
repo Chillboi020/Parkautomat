@@ -3,9 +3,11 @@ package com.ekorn.parkautomatfx.parkautomat;
 import com.ekorn.parkautomatfx.exceptions.WechselgeldException;
 
 public class Geldmenge {
-
+    //region Fields
     private final int[] muenzMenge = new int[8];
+    //endregion
 
+    //region Constructors
     public Geldmenge(int ten_cent, int twenty_cent, int fifty_cent,
                      int one, int two, int five, int ten, int twenty) {
         int[] mengen = {ten_cent, twenty_cent, fifty_cent, one, two, five, ten, twenty};
@@ -32,14 +34,17 @@ public class Geldmenge {
                 copy.getAnzahl(3), copy.getAnzahl(4), copy.getAnzahl(5),
                 copy.getAnzahl(6), copy.getAnzahl(7));
     }
+    //endregion
 
+    //region Methods
     public int getAnzahl(int muenzart) {
         return muenzMenge[muenzart];
     }
 
     public void setAnzahl(int muenzart, int anzahl) throws WechselgeldException {
         if (anzahl < 0) {
-            throw new WechselgeldException(4, 0);
+            int lang = 1;
+            throw new WechselgeldException(3, lang);
         }
         muenzMenge[muenzart] = anzahl;
     }
@@ -60,4 +65,5 @@ public class Geldmenge {
         }
         return output;
     }
+    //endregion
 }

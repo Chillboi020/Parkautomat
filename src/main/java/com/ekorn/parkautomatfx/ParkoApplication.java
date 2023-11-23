@@ -14,7 +14,7 @@ public class ParkoApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(ParkoApplication.class.getResource("parkautomat-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Edwins Parkautomat");
+        stage.setTitle("Der Parkautomat");
         stage.getIcons().add(new Image(Objects.requireNonNull(ParkoApplication.class.getResourceAsStream("/icon.png"))));
         stage.setScene(scene);
         stage.setResizable(false);

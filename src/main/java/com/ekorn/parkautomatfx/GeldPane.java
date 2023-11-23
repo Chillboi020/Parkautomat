@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 import java.io.IOException;
 
 public class GeldPane extends Pane {
+    //region Fields
     @FXML
     private TextField txt_zehnCent = new TextField("0");
     @FXML
@@ -30,9 +31,10 @@ public class GeldPane extends Pane {
     private TextField txt_zwanzigEuro = new TextField("0");
     @FXML
     private Label lbl_gesamt;
-
     private final Kasse k = new Kasse();
+    //endregion
 
+    //region Constructors
     public GeldPane() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("geld-pane.fxml"));
         fxmlLoader.setRoot(this);
@@ -44,7 +46,9 @@ public class GeldPane extends Pane {
             throw new RuntimeException(exception);
         }
     }
+    //endregion
 
+    //region Methods
     /**
      * gets the amount of the given money-type from the current GeldPane.
      *
@@ -121,4 +125,9 @@ public class GeldPane extends Pane {
         }
         return wechselgeld;
     }
+
+    public void setLanguage(int lang) {
+        k.setLang(lang);
+    }
+    //endregion
 }
